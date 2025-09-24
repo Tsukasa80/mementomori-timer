@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { getTodayInJST, calculateRemainingDays, formatDateForDisplay, getCurrentJSTISOString } from '@/lib/date'
+import { getTodayInJST, calculateRemainingDays, formatDateForDisplay, getCurrentJSTISOString, isValidDateString } from '@/lib/date'
 import { getDayRecord, saveDayRecord, getSettings } from '@/lib/storage'
 import { DayRecord, Settings } from '@/lib/schema'
 
@@ -36,6 +36,9 @@ function TodayPageContent() {
   const [saving, setSaving] = useState(false)
 
   const today = getTodayInJST()
+  // URL の date クエリがあればその日付を優先（YYYY-MM-DD）。不正なら当日。
+  const dateParam = searchParams.get('date')
+  const selectedDate = dateParam && isValidDateString(dateParam) ? dateParam : today
 
   // 朝のフォーム
   const morningForm = useForm<MorningFormData>({
@@ -63,7 +66,7 @@ function TodayPageContent() {
     const loadData = async () => {
       try {
         const [recordData, settingsData] = await Promise.all([
-          getDayRecord(today),
+          getDayRecord(selectedDate),
           getSettings(),
         ])
 
@@ -95,7 +98,7 @@ function TodayPageContent() {
     }
 
     loadData()
-  }, [today, morningForm, eveningForm])
+  }, [selectedDate, morningForm, eveningForm])
 
   // URLパラメータからタブを設定
   useEffect(() => {
@@ -114,8 +117,9 @@ function TodayPageContent() {
       const now = getCurrentJSTISOString()
       const updatedRecord: DayRecord = {
         ...dayRecord,
+        date: selectedDate,
         morning: {
-          date: today,
+          date: selectedDate,
           answers: {
             usage: data.usage,
             regret: data.regret,
@@ -145,8 +149,9 @@ function TodayPageContent() {
       const now = getCurrentJSTISOString()
       const updatedRecord: DayRecord = {
         ...dayRecord,
+        date: selectedDate,
         evening: {
-          date: today,
+          date: selectedDate,
           answers: {
             mostVital: data.mostVital,
             waste: data.waste,
@@ -214,7 +219,7 @@ function TodayPageContent() {
           )}
         </h1>
         <p className="text-sm text-gray-600 mt-1">
-          {formatDateForDisplay(today)}
+          {formatDateForDisplay(selectedDate)}
         </p>
       </header>
 
