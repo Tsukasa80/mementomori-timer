@@ -11,15 +11,15 @@ import { DayRecord, Settings } from '@/lib/schema'
 
 // フォームのスキーマ
 const MorningFormSchema = z.object({
-  usage: z.string().max(2000, '2000文字以内で入力してください'),
-  regret: z.string().max(2000, '2000文字以内で入力してください'),
+  usage: z.string().min(1, '記入が必要です').max(2000, '2000文字以内で入力してください'),
+  regret: z.string().min(1, '記入が必要です').max(2000, '2000文字以内で入力してください'),
   freeText: z.string().max(2000, '2000文字以内で入力してください').optional(),
 })
 
 const EveningFormSchema = z.object({
-  mostVital: z.string().max(2000, '2000文字以内で入力してください'),
-  waste: z.string().max(2000, '2000文字以内で入力してください'),
-  tomorrow: z.string().max(2000, '2000文字以内で入力してください'),
+  mostVital: z.string().min(1, '記入が必要です').max(2000, '2000文字以内で入力してください'),
+  waste: z.string().min(1, '記入が必要です').max(2000, '2000文字以内で入力してください'),
+  tomorrow: z.string().min(1, '記入が必要です').max(2000, '2000文字以内で入力してください'),
   freeText: z.string().max(2000, '2000文字以内で入力してください').optional(),
 })
 
